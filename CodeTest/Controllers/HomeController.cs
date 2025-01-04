@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Quote.Contracts;
 using Quote.Models;
@@ -20,8 +22,13 @@ namespace PruebaIngreso.Controllers
             return View();
         }
 
-        public ActionResult Test()
+        [HttpGet]
+        public async Task<ActionResult> Test(string testCode)
         {
+            if (string.IsNullOrWhiteSpace(testCode))
+            {
+                testCode = "E-U10-PRVPARKTRF";
+            }
             var request = new TourQuoteRequest
             {
                 adults = 1,
@@ -34,12 +41,12 @@ namespace PruebaIngreso.Controllers
                     GetContracts = true,
                     GetCalculatedQuote = true,
                 },
-                TourCode = "E-U10-PRVPARKTRF",
+                TourCode = testCode,
                 Language = Language.Spanish
             };
 
-            var result = this.quote.Quote(request);
-            var tour = result.Tours.FirstOrDefault();
+            var result = await this.quote.Quote(request);
+            var tour =  result.Tours.FirstOrDefault();
             ViewBag.Message = "Test 1 Correcto";
             return View(tour);
         }
@@ -50,12 +57,26 @@ namespace PruebaIngreso.Controllers
             return View();
         }
 
-        public ActionResult Test3()
+        [HttpGet]
+        public async Task<ActionResult> Test3(string test3Code)
         {
+            var result =  await this.quote.GetMarginAsync(test3Code);
+            if(result.StatusCode == HttpStatusCode.OK)
+            {
+                ViewBag.Message = result.Message;
+
+            }
+            else
+            {
+                ViewBag.Message = "{ \"margin\": 0.0 }";
+
+            }
+
             return View();
         }
 
-        public ActionResult Test4()
+        [HttpGet]
+        public async Task<ActionResult> Test4(string test4Code)
         {
             var request = new TourQuoteRequest
             {
@@ -69,10 +90,11 @@ namespace PruebaIngreso.Controllers
                     GetContracts = true,
                     GetCalculatedQuote = true,
                 },
+                TourCode = test4Code,
                 Language = Language.Spanish
             };
 
-            var result = this.quote.Quote(request);
+            var result = await this.quote.Quote(request);
             return View(result.TourQuotes);
         }
     }

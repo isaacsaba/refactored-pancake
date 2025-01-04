@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -24,6 +25,7 @@ namespace PruebaIngreso
             //register other services
 
             container.EnableMvc();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
         protected void Application_Error(object sender, EventArgs e)
